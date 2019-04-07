@@ -12,7 +12,7 @@ hadoop fs -mkdir /tmp/input
 hadoop fs -put *.txt /tmp/input
 
 # run stopwords mapper and reducer function 
-hadoop jar /usr/local/hadoop-2.7.6/share/tools/lib/hadoop-streaming-2.7.6.jar -files mapper_stopwords.py,reducer_stopwords.py -mapper mapper_stopwords.py -reducer reducer_stopwords.py -input /tmp/input/ -output /tmp/stopwords
+git clone https://github.com/SeanWang17/cs560
 
 # get the stopwords output to local file system and name it to stopwords.txt
 hadoop fs -get /tmp/stopwords .
