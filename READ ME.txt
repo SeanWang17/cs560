@@ -1,0 +1,30 @@
+# add hadoop to environment
+export HADOOP_HOME=/usr/local/hadoop-2.7.6
+export PATH=${JAVA_HOME}/bin:${HADOOP_HOME}/bin:${PATH}
+export HADOOP_CLASSPATH=${JAVA_HOME}/share/hadoop/tools/lib
+
+# upload files to the server (python srcipt and input txt files)
+pscp -i ../private.ppk *.py Xiaoyang@c220g2-011128vm-2.wisc.cloudlab.us:
+
+# make python script excutable and transfer txt files to HDFS
+chmod +x .py
+hadoop fs -mkdir /tmp/input
+hadoop fs -put *.txt /tmp/input
+
+# run stopwords mapper and reducer function 
+hadoop jar /usr/local/hadoop-2.7.6/share/tools/lib/hadoop-streaming-2.7.6.jar -files mapper_stopwords.py,reducer_stopwords.py -mapper mapper_stopwords.py -reducer reducer_stopwords.py -input /tmp/input/ -output /tmp/stopwords
+
+# get the stopwords output to local file system and name it to stopwords.txt
+hadoop fs -get /tmp/stopwords .
+cp stopwords/part-00000 stopwords.txt
+
+# run index mapper adn reducer function
+hadoop jar /usr/local/hadoop-2.7.6/share/hadoop/tools/lib/hadoop-streaming-2.7.6.jar -files mapper_index.py,reducer_index.py,stopwords.txt -mapper mapper_index.py -reducer reducer_index.py -input /tmp/input/ -output /tmp/index
+
+# get the index output to local file system
+hadoop fs -get /tmp/index .
+
+# query the index
+python query.py
+
+
